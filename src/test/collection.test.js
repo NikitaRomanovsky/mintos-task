@@ -1,144 +1,108 @@
-import { postCredentials } from "../httpMethod/postAuth";
-import * as variables from "../utils/globalVariables";
-import { credentialsBody } from "../bodyStructure/authBody";
-import { getAllBookingIds } from "../httpMethod/getAllBookingIds";
-import { postCreateBooking } from "../httpMethod/postCreateBooking";
-import { createBodyBooking, updatePatchBodyBooking, updatePutBodyBooking } from "../bodyStructure/bookingBody";
-import { getBookingById } from "../httpMethod/getBookingById";
-import { putUpdateBooking } from "../httpMethod/putUpdateBooking";
-import { patchUpdateBooking } from "../httpMethod/patchUpdateBooking";
-import { deleteBooking } from "../httpMethod/delDeleteBooking";
-import { getDeletedBooking } from "../httpMethod/getDeletedBooking";
+import { createAccountBody } from '../bodyStructure/requestBodies';
+import { createAccountRequest } from '../requests/requests';
+import { generateRandomEmail } from '../utils/randomGenerator';
 
+describe('Create account with valid data', () => {
+	let response;
 
-describe('post credentials to receive auth token', () => {
-    let response
-    beforeAll(async () => {
-        response = await postCredentials(credentialsBody, variables.headerAuth);
-        console.log('Response is:', response.data);
-    })
+	beforeAll(async () => {
+		const body = {
+			...createAccountBody,
+			email: generateRandomEmail(),
+		};
 
-    afterAll(async () => {
-        variables.token = response.data.token
-        console.log(variables.token);
-    })  
+		response = await createAccountRequest(body);
+		console.log('Reponse is: ', response.data);
+	});
 
-    test('Confirm that status code is 200', async () => {
-        await expect(response.status).toEqual(200)
-    })
-})
+	test('Confirm that request is successful', async () => {
+		expect(response.status).toEqual(200);
+	});
+});
 
+describe('Create account with already taken email', () => {
+	let body;
 
-describe('Get all booking IDs', () => {
-    let response
-    beforeAll(async () => {
-        response = await getAllBookingIds();
-    })
+	beforeAll(async () => {
+		body = {
+			...createAccountBody,
+			email: generateRandomEmail(),
+		};
 
-    test('Confirm that status code is 200', async () => {
-        await expect(response.status).toEqual(200)
-    })
-})
+		const response = await createAccountRequest(body);
+		console.log('Reponse is: ', response.data);
+	});
 
+	test('Confirm that request is failed with 400', async () => {
+		try {
+			await createAccountRequest(body);
+		} catch (error) {
+			console.log('Error response is: ', error.response.data);
 
-describe('Create new booking', () => {
-    let response
-    beforeAll(async () => {
-        response = await postCreateBooking(createBodyBooking, variables.headerBooking)
-        console.log('Response is:', response.data);
-    })
+			expect(error.response.status).toEqual(400);
+			expect(error.response.data.message).toEqual(
+				'User with same email already exists'
+			);
+		}
+	});
+});
 
-    afterAll(async () => {
-        variables.bookingId = response.data.bookingid
-        console.log('ID is:', variables.bookingId);
-      })
+describe('Create account with weak password', () => {
+	let body;
 
-    test('Confirm that status code is 200', async () => {
-        await expect(response.status).toEqual(200)
-    })
+	beforeAll(() => {
+		body = {
+			...createAccountBody,
+			email: generateRandomEmail(),
+			password: '123abc',
+		};
+	});
 
-    test('Confirm that booking is created with expected name only', async () => {
-        await expect(response.data.booking.firstname).toEqual('Nikita')
-    })
-})
+	test('Confirm that request is failed with 400', async () => {
+		try {
+			await createAccountRequest(body);
+		} catch (error) {
+			console.log('Error response is: ', error.response.data);
 
-describe('Find booking info by its ID', () => {
-    let response
-    
-    beforeAll(async () => {
-        response = await getBookingById(variables.headerBookingById)
-        console.log('Response is:', response.data);
-    })
+			expect(error.response.status).toEqual(400);
+			expect(error.response.data.message).toEqual('Password validation failed');
+		}
+	});
+});
 
-    test('Confirm that status code is 200', async () => {
-        await expect(response.status).toEqual(200)
-    })
+describe('Create account with invalid email format', () => {
+	let body;
 
-    test('Confirm that booking is found with expected name only', async () => {
-        await expect(response.data.firstname).toEqual('Nikita')
-    })
-})
+	beforeAll(() => {
+		body = {
+			...createAccountBody,
+			email: '123abc',
+		};
+	});
 
-describe("Update booking's price and checkout date using PUT method", () => {
-    let response
+	test('Confirm that request is failed with 400', async () => {
+		try {
+			await createAccountRequest(body);
+		} catch (error) {
+			console.log('Error response is: ', error.response.data);
 
-    beforeAll(async () => {
-        response = await putUpdateBooking(updatePutBodyBooking, variables.headerForAuthorization)
-        console.log('Response is:', response.data);
-    })
+			expect(error.response.status).toEqual(400);
+			expect(error.response.data.message).toEqual(
+				"'Email' is not a valid email address."
+			);
+		}
+	});
+});
 
-    test('Confirm that status code is 200', async () => {
-        await expect(response.status).toEqual(200)
-    })
+describe('Create account with missing email', () => {
+	test('Confirm that request is failed with 500', async () => {
+		const { email, ...body } = createAccountBody;
+		try {
+			await createAccountRequest(body);
+		} catch (error) {
+			console.log('Error response is: ', error.response.data);
 
-    test('Confirm that booking is updated above expected price range', async () => {
-        await expect(response.data.totalprice).toBeGreaterThan(99)
-    })
-})
-
-describe("Update booking's deposit state and needs using PATCH method", () => {
-    let response
-
-    beforeAll(async () => {
-        response = await patchUpdateBooking(updatePatchBodyBooking, variables.headerForAuthorization)
-        console.log('Response is:', response.data);
-    })
-
-    test('Confirm that status code is 200', async () => {
-        await expect(response.status).toEqual(200)
-    })
-
-    test('Confirm that booking is updated with expected additional need', async () => {
-        await expect(response.data.additionalneeds).toEqual('Parking')
-    })
-
-    test('Confirm that booking is updated with expected desposit paid state', async () => {
-        await expect(response.data.depositpaids).toBeFalsy()
-    })
-})
-
-
-describe('Delete booking', () => {
-    let response
-
-    beforeAll(async () => {
-        response = await deleteBooking(variables.headerForAuthorization)
-    })
-
-    test('Confirm that status code is 201', async () => {
-        await expect(response.status).toEqual(201)
-    })
-})
-
-
-describe('Should not find deleted booking by ID', () => {
-    let response
-    
-    beforeAll(async () => {
-        response = await getDeletedBooking(variables.headerBookingById).catch(error => error)
-    })
-
-    test('Confirm that status code is 404', async () => {
-        await expect(response.message).toEqual('Request failed with status code 404')
-    })
-})
+			expect(error.response.status).toEqual(500);
+		}
+	});
+});
