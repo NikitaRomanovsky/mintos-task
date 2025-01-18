@@ -1,6 +1,8 @@
 # bonapp-task
 
-This project tests create account API endpoint under positive and negative conditions, leveraging randomized data to ensure no hardcoded or duplicated values are used. Each request is dynamically generated, providing unique inputs for each test run.
+This project tests create account API endpoint under positive and negative conditions, leveraging randomized data to ensure no hardcoded or duplicated values are used. Each request is dynamically generated, providing unique inputs for each test run.\
+
+It also includes Postman collection for positive scenarios of create account functionality. Postman as well leverages randomized data in pre-request hooks and validate the response code in post-request hook.
 
 The project is built with the following technologies:
 
