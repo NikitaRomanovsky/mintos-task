@@ -1,17 +1,21 @@
 # bonapp-task
 
-This project tests different HTTPS request on booking endpoint.  
-For all requests respective testing suites have been created.  
-Requests are sent using Axios.  
-Tests are run using Jest.  
-Additionally, lodash and memento libraries were used.
+This project tests create accout API under positive and negative conditions.  
+Requests are sent using **Axios**.  
+Tests are run using **Jest**.  
+Additionally, **lodash** library was used for random strings generation.
 
-To make project work run the following commands after clonning the repo:
+## Getting Started
 
+To make the project work, run the following commands after cloning the repo:\
+**NB: Make sure that Yarn package manager is installed globally on your machine**\
+
+To install all dependecies:
+```bash
 yarn init  
 yarn install
-
-To run all test cases, use the following command:
-
-yarn run jest  
-It is expected that all tests are passed (green).
+```
+To run all tests:
+```bash
+yarn jest  
+```
