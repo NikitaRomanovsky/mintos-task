@@ -1,0 +1,359 @@
+{
+	"info": {
+		"_postman_id": "157c792a-5a4b-4df1-b441-9d7a00074788",
+		"name": "BonApp Collection",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "28509376"
+	},
+	"item": [
+		{
+			"name": "Create account",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const lodash = require('lodash');",
+							"",
+							"function generateRandomString(length) {",
+							"    return lodash.sampleSize('ABCdef12345', length).join('');",
+							"}",
+							"",
+							"let randomEmail = `${generateRandomString(10)}@test.com`",
+							"let randomPassword = `${generateRandomString(20)}?@!`",
+							"let randomConfirmationUrl = `https://${generateRandomString(10)}.com`",
+							"let languageId = lodash.random(0, 5)",
+							"",
+							"pm.collectionVariables.set(\"email\", randomEmail)",
+							"pm.collectionVariables.set(\"initialPassword\", randomPassword)",
+							"pm.collectionVariables.set(\"emailConfirmationUrl\", randomConfirmationUrl)",
+							"pm.collectionVariables.set(\"languageId\", languageId)"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Assert status code is 200\", () => {",
+							"    pm.expect(pm.response.code).to.eql(200);",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"{{email}}\",\n    \"password\": \"{{initialPassword}}\",\n    \"languageId\": {{languageId}},\n    \"emailConfirmationUrl\": \"{{emailConfirmationUrl}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/api/account/register",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"account",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Confirm email",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/api/account/confirmEmail",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"account",
+						"confirmEmail"
+					],
+					"query": [
+						{
+							"key": "userId",
+							"value": "{{email}}",
+							"disabled": true
+						},
+						{
+							"key": "code",
+							"value": "1",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Send email confirmation",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Assert status code is 200\", () => {",
+							"    pm.expect(pm.response.code).to.eql(200);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/api/account/sendConfirmationEmail/{{languageId}}?email={{email}}&emailConfirmationUrl={{emailConfirmationUrl}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"account",
+						"sendConfirmationEmail",
+						"{{languageId}}"
+					],
+					"query": [
+						{
+							"key": "email",
+							"value": "{{email}}"
+						},
+						{
+							"key": "emailConfirmationUrl",
+							"value": "{{emailConfirmationUrl}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Request password change",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const lodash = require('lodash');",
+							"",
+							"function generateRandomString(length) {",
+							"    return lodash.sampleSize('ABCdef12345', length).join('');",
+							"}",
+							"",
+							"let randomChangePasswordUrl = `https://${generateRandomString(10)}.com`",
+							"",
+							"pm.collectionVariables.set(\"confirmChangePasswordUrl\", randomChangePasswordUrl)"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Assert status code is 200\", () => {",
+							"    pm.expect(pm.response.code).to.eql(200);",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"{{email}}\",\n    \"languageId\": {{languageId}},\n    \"confirmChangePasswordUrl\": \"{{confirmChangePasswordUrl}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/api/account/changePasswordRequest",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"account",
+						"changePasswordRequest"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Change password",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Assert status code is 200\", () => {",
+							"    pm.expect(pm.response.code).to.eql(200);",
+							"});",
+							"",
+							"pm.test(\"Assert status text is OK\", () => {",
+							"    pm.expect(pm.response.text).to.eql('OK');",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const lodash = require('lodash');",
+							"",
+							"function generateRandomString(length) {",
+							"    return lodash.sampleSize('ABCdef12345', length).join('');",
+							"}",
+							"",
+							"let newRandomPassword = `${generateRandomString(20)}?@!`",
+							"let initialPassword = pm.globals.get(\"initialPassword\");",
+							"let resetCode = lodash.random(0, 5)",
+							"",
+							"pm.collectionVariables.set(\"changedPassword\", newRandomPassword)",
+							"pm.collectionVariables.set(\"passwordResetCode\", resetCode)",
+							"",
+							"",
+							"if (newRandomPassword === initialPassword) {",
+							"    throw new Error(`Assertion failed: new password (${newRandomPassword}) is equal to old password (${initialPassword})`);",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"{{email}}\",\n    \"resetCode\": \"{{passwordResetCode}}\",\n    \"newPassword\": \"{{changedPassword}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/api/account/changePassword",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"account",
+						"changePassword"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "host",
+			"value": "https://bonaapp-dev-afhjdsgqcuc6fxch.z02.azurefd.net",
+			"type": "string"
+		},
+		{
+			"key": "email",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "initialPassword",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "languageId",
+			"value": "0",
+			"type": "string"
+		},
+		{
+			"key": "emailConfirmationUrl",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "userId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "confirmEmailCode",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "confirmChangePasswordUrl",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "passwordResetCode",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "changedPassword",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
