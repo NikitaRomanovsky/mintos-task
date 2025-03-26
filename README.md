@@ -22,7 +22,8 @@ Additionally, in the root directory, there is a `.env` file where the user must 
 
 ## Prerequisites
 
-- Ensure that **Yarn** package manager is installed globally on your machine.
+- Ensure that **Node.js and NPM** package managers are installed globally on your machine. It will be used to install Yarn. Please see https://nodejs.org/en/download
+- After the above is done, ensure that **Yarn** package manager is installed globally on your machine. It will be used to install all project dependencies. Please see https://classic.yarnpkg.com/lang/en/docs/install/#mac-stable
 
 ## Getting Started
 
@@ -30,8 +31,8 @@ Follow these steps to set up and run the project:
 
 1. Clone the repository:
    ```bash
-   git clone <repository-url>
-   cd bonapp-task
+   git clone https://github.com/NikitaRomanovsky/mintos-task.git
+   cd mintos-task
    ```
 
 2. Populate a `.env` file in the root directory with the following content:
