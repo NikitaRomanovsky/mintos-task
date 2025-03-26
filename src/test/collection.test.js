@@ -59,7 +59,7 @@ describe("User API Tests", () => {
   describe("Get User API Tests", () => {
     test("Get the user by ID", async () => {
       const getAllUsersResponse = await getUsers();
-      createdUserId = getAllUsersResponse.data[0].id;
+      createdUserId = getAllUsersResponse.data[0].id; // The approach works for empty database. Where just created user in tests above always be the first one
 
       const getUserResponse = await getUserById(createdUserId);
 
