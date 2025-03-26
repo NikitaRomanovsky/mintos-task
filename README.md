@@ -1,6 +1,6 @@
 # mintos-task
 
-This project is an API testing suite that covers CRUD operations for the **User** entity. It includes tests for all happy paths, edge cases, and additional bonus points such as security and data-driven tests. The goal is to ensure the API behaves as expected under various conditions.
+This project is an API testing suite that covers CRUD operations for the **User** entity. It includes tests for all happy paths, edge cases, and additional bonus points, such as security and data-driven tests. The goal is to ensure that the API behaves as expected under various conditions. **Please note** that tests are created in a sense that they will be running against real API with an empty database.
 
 ## Project Structure
 
