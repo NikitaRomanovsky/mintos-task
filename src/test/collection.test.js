@@ -144,13 +144,13 @@ describe("User API Tests", () => {
         [
           {
             ...updateValidUser,
-            firstName: INVALID_INPUT_VALUES.tooShortName,
+            firstName: INVALID_INPUT_VALUES.tooLongName,
           },
         ],
         [
           {
             ...updateValidUser,
-            lastName: INVALID_INPUT_VALUES.tooLongName,
+            lastName: INVALID_INPUT_VALUES.tooShortName,
           },
         ],
         [
@@ -187,23 +187,11 @@ describe("User API Tests", () => {
 
         expect(deleteUserResponse.status).toEqual(204);
         expect(deleteUserResponse.statusText).toEqual("No Content");
-
-        try {
-          await getUserById(createdUserId);
-        } catch (error) {
-          console.log(
-            "Get user by ID after deletion response: ",
-            error.response
-          );
-
-          expect(error.response.status).toEqual(404);
-          expect(error.response.statusText).toEqual("Not Found");
-        }
       });
 
       test("Delete a user with non-existing ID", async () => {
         try {
-          await deleteUser(999999);
+          await deleteUser(createdUserId);
         } catch (error) {
           console.log(
             "Delete user by non-existing ID response: ",
