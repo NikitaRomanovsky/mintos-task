@@ -34,7 +34,7 @@ Follow these steps to set up and run the project:
    cd bonapp-task
    ```
 
-2. Create a `.env` file in the root directory with the following content:
+2. Populate a `.env` file in the root directory with the following content:
    ```env
    API_BASE_URL=http://your-server-url/api
    API_USERNAME=your-username
