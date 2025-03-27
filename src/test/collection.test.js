@@ -4,6 +4,7 @@ import {
   updateValidUser,
   updateInvalidUser,
 } from "../bodyStructure/requestBodies";
+
 import {
   createUser,
   getUsers,
@@ -12,6 +13,12 @@ import {
   deleteUser,
   unauthenticatedCreateUser,
 } from "../requests/requests";
+
+import {
+  EXPECTED_RESPONSE_CODES,
+  EXPECTED_RESPONSE_MESSAGES,
+  EXPECTED_ERROR_SCHEME,
+} from "../utils/expectedPayloadValues";
 
 describe("User API Tests", () => {
   let createdUserId;
@@ -22,8 +29,12 @@ describe("User API Tests", () => {
 
       console.log("Create valid user response: ", createUserResponse);
 
-      expect(createUserResponse.status).toEqual(201);
-      expect(createUserResponse.statusText).toEqual("Created");
+      expect(createUserResponse.status).toEqual(
+        EXPECTED_RESPONSE_CODES.created
+      );
+      expect(createUserResponse.statusText).toEqual(
+        EXPECTED_RESPONSE_MESSAGES.created
+      );
     });
 
     test("Create a user without providing 'lastName'", async () => {
@@ -32,11 +43,17 @@ describe("User API Tests", () => {
       } catch (error) {
         console.log("Create invalid user response: ", error.response);
 
-        expect(error.response.status).toEqual(400);
-        expect(error.response.statusText).toEqual("Bad Request");
-        expect(error.response.data.title).toEqual("Invalid Input"); // I assume it to be the title considering API consistency. Comment out if I am wrong
+        expect(error.response.status).toEqual(
+          EXPECTED_RESPONSE_CODES.badRequest
+        );
+        expect(error.response.statusText).toEqual(
+          EXPECTED_RESPONSE_MESSAGES.badRequest
+        );
+        expect(error.response.data.title).toEqual(EXPECTED_ERROR_SCHEME.title); // I assume it to be the title considering API consistency. Comment out if I am wrong
         expect(error.response.data.detail).toContain("lastName"); // Since I do not know the exact error message received, I assume it to at least contain 'lastName'. Comment out if I am wrong
-        expect(error.response.data.instance).toEqual("/users");
+        expect(error.response.data.instance).toEqual(
+          EXPECTED_ERROR_SCHEME.instance
+        );
       }
     });
 
@@ -50,8 +67,12 @@ describe("User API Tests", () => {
           error.response
         );
 
-        expect(error.response.status).toBe(401);
-        expect(error.response.statusText).toBe("Unauthorized");
+        expect(error.response.status).toBe(
+          EXPECTED_RESPONSE_CODES.unauthorized
+        );
+        expect(error.response.statusText).toBe(
+          EXPECTED_RESPONSE_MESSAGES.unauthorized
+        );
       }
     });
   });
@@ -65,8 +86,10 @@ describe("User API Tests", () => {
 
       console.log("Get user by ID response: ", getUserResponse.data);
 
-      expect(getUserResponse.status).toEqual(200);
-      expect(getUserResponse.statusText).toEqual("OK");
+      expect(getUserResponse.status).toEqual(EXPECTED_RESPONSE_CODES.success);
+      expect(getUserResponse.statusText).toEqual(
+        EXPECTED_RESPONSE_MESSAGES.success
+      );
       expect(getUserResponse.data).toEqual(
         expect.objectContaining(createValidUser)
       );
@@ -78,8 +101,10 @@ describe("User API Tests", () => {
       } catch (error) {
         console.log("Get user by non-existing ID response: ", error.response);
 
-        expect(error.response.status).toEqual(404);
-        expect(error.response.statusText).toEqual("Not Found");
+        expect(error.response.status).toEqual(EXPECTED_RESPONSE_CODES.notFound);
+        expect(error.response.statusText).toEqual(
+          EXPECTED_RESPONSE_MESSAGES.notFound
+        );
       }
     });
   });
@@ -93,8 +118,12 @@ describe("User API Tests", () => {
 
       console.log("Update user response: ", updateUserResponse.data);
 
-      expect(updateUserResponse.status).toEqual(200);
-      expect(updateUserResponse.statusText).toEqual("OK");
+      expect(updateUserResponse.status).toEqual(
+        EXPECTED_RESPONSE_CODES.success
+      );
+      expect(updateUserResponse.statusText).toEqual(
+        EXPECTED_RESPONSE_MESSAGES.success
+      );
       expect(updateUserResponse.data.lastName).toEqual(
         updateValidUser.lastName
       );
@@ -110,8 +139,10 @@ describe("User API Tests", () => {
           error.response
         );
 
-        expect(error.response.status).toEqual(404);
-        expect(error.response.statusText).toEqual("Not Found");
+        expect(error.response.status).toEqual(EXPECTED_RESPONSE_CODES.notFound);
+        expect(error.response.statusText).toEqual(
+          EXPECTED_RESPONSE_MESSAGES.notFound
+        );
       }
     });
 
@@ -124,13 +155,19 @@ describe("User API Tests", () => {
           error.response
         );
 
-        expect(error.response.status).toEqual(400);
-        expect(error.response.statusText).toEqual("Bad Request");
-        expect(error.response.data.title).toEqual("Invalid Input");
+        expect(error.response.status).toEqual(
+          EXPECTED_RESPONSE_CODES.badRequest
+        );
+        expect(error.response.statusText).toEqual(
+          EXPECTED_RESPONSE_MESSAGES.badRequest
+        );
+        expect(error.response.data.title).toEqual(EXPECTED_ERROR_SCHEME.title);
         expect(error.response.data.detail).toEqual(
           "The countryOfIssue must be an ISO 3166-1 alpha-2 code."
         );
-        expect(error.response.data.instance).toEqual("/users");
+        expect(error.response.data.instance).toEqual(
+          EXPECTED_ERROR_SCHEME.instance
+        );
       }
 
       // Bonus: Data-driven tests
@@ -170,10 +207,16 @@ describe("User API Tests", () => {
               error.response
             );
 
-            expect(error.response.status).toBe(400);
-            expect(error.response.statusText).toBe("Bad Request");
-            expect(error.response.data.title).toBe("Invalid Input");
-            expect(error.response.data.instance).toBe("/users");
+            expect(error.response.status).toBe(
+              EXPECTED_RESPONSE_CODES.badRequest
+            );
+            expect(error.response.statusText).toBe(
+              EXPECTED_RESPONSE_MESSAGES.badRequest
+            );
+            expect(error.response.data.title).toBe(EXPECTED_ERROR_SCHEME.title);
+            expect(error.response.data.instance).toBe(
+              EXPECTED_ERROR_SCHEME.instance
+            );
           }
         }
       );
@@ -185,8 +228,12 @@ describe("User API Tests", () => {
 
         console.log("Delete user response: ", deleteUserResponse);
 
-        expect(deleteUserResponse.status).toEqual(204);
-        expect(deleteUserResponse.statusText).toEqual("No Content");
+        expect(deleteUserResponse.status).toEqual(
+          EXPECTED_RESPONSE_CODES.noContent
+        );
+        expect(deleteUserResponse.statusText).toEqual(
+          EXPECTED_RESPONSE_MESSAGES.noContent
+        );
 
         try {
           await getUserById(createdUserId);
@@ -196,8 +243,12 @@ describe("User API Tests", () => {
             error.response
           );
 
-          expect(error.response.status).toEqual(404);
-          expect(error.response.statusText).toEqual("Not Found");
+          expect(error.response.status).toEqual(
+            EXPECTED_RESPONSE_CODES.notFound
+          );
+          expect(error.response.statusText).toEqual(
+            EXPECTED_RESPONSE_MESSAGES.notFound
+          );
         }
       });
 
@@ -210,8 +261,12 @@ describe("User API Tests", () => {
             error.response
           );
 
-          expect(error.response.status).toEqual(404);
-          expect(error.response.statusText).toEqual("Not Found");
+          expect(error.response.status).toEqual(
+            EXPECTED_RESPONSE_CODES.notFound
+          );
+          expect(error.response.statusText).toEqual(
+            EXPECTED_RESPONSE_MESSAGES.notFound
+          );
         }
       });
     });
